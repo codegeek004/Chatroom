@@ -71,6 +71,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chatbot.wsgi.application'
 ASGI_APPLICATION = 'chatbot.asgi.application'
+CHANNELS_LAYERS = {
+    "default" : {
+        "BACKEND" : "channels_redis.core.RedisChannelLayer",
+        "CONFIG" : {
+            "hosts" : [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -100,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
