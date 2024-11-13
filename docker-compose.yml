@@ -1,0 +1,27 @@
+
+services:
+  web:
+    image: python:3.9  # Use the desired Python version
+    container_name: django_web
+    volumes:
+      - .:/app  # Mount your project directory to the /app folder in the container
+    working_dir: /app  # Set the working directory to /app
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+    environment:
+      - DEBUG=1  # Set this to 0 for production
+    ports:
+      - "8000:8000"  # Map port 8000 on host to port 8000 in container
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine  # Use a lightweight Redis image
+    container_name: django_redis
+    ports:
+      - "6379:6379"  # Expose Redis on port 6379
+
+
