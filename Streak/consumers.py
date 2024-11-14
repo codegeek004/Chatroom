@@ -1,35 +1,46 @@
 import json
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync
 
-class ChatConsumer(WebsocketConsumer):
-	
-	async def connect(self):
-		self.room_name = self.scope['url_route']['kwargs']['room_name']
-		self.room_group_name = 'chat%s' % self.room_name
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        try:
+            self.room_name = self.scope['url_route']['kwargs']['room_name']
+            self.room_group_name = f'chat_{self.room_name}'
+            print(self.room_name, 'room ka name')
+            print(self.room_group_name, 'room group ka name')
 
-		#join room group
-		await channel_layer.group_add(self.room_group_name, self.channel_name)
-		await self.accept()
+            # Join room group
+            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+            await self.accept()
+        except Exception as e:
+            print(f"Error in connect: {e}")
 
-	async def disconnect(self, close_node):
-		#Leave from group
-		await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+    async def disconnect(self, close_code):
+        try:
+            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        except Exception as e:
+            print(f"Error in disconnect: {e}")
 
-	#Receive message from the websocket
-	async def receive(self, text_data):
-		text_data_json = json.loads(text_data)
-		message = text_data_json["message"]
+    async def receive(self, text_data):
+        try:
+            text_data_json = json.loads(text_data)
+            message = text_data_json["message"]
 
-		# async_to_sync(self.channel_layer.group_send)(
-		# 	self.room_group_name, {'type':'chat_message', 'message': message}
-		# 	)
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message
+                }
+            )
+        except Exception as e:
+            print(f"Error in receive: {e}")
 
-	#Recieve message from room group
-	def chat_message(self, event):
-		message = event["message"]
-
-		#Send message to  websocket
-		self.send(text_data=json.dumps({'message':message}))
-
-		
+    async def chat_message(self, event):
+        try:
+            message = event["message"]
+            await self.send(text_data=json.dumps({'message': message}))
+        except Exception as e:
+            print(f"Error in chat_message: {e}")

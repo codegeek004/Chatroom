@@ -1,27 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>Streak</title>
+    <meta charset="utf-8">
+    <title>Streak</title>
 </head>
 <body>
-	Would you like to enter the chat room<br>
-	<input id="romm-name-input" type="text" size="100"><br>
-	<input id="room-name-submit" type="button" value="Enter">
-
-	<script>
-		// This line ensures that when the page loads, the text input field (room-name-input) is automatically focused, so the user can start typing immediately.
-	document.querySelector('#room-name-input').focus();
-	// This code listens for the Enter key (key code 13) while typing in the input field. If the user presses Enter, it simulates a click on the "Enter" button to submit the room name.
-        document.querySelector('#room-name-input').onkeyup = function(e) {
-            if (e.keyCode === 13) {  // enter, return
-                document.querySelector('#room-name-submit').click();
-            }
-        };
-
-        document.querySelector('#room-name-submit').onclick = function(e) {
-            var roomName = document.querySelector('#room-name-input').value;
-            window.location.pathname = '/chat/' + roomName + '/';
-        };
-	</script>
+    <h2>Enter Chat Room</h2>
+    <form action="{% url 'room' room_name='room_name' %}">
+        <input id="room-name-input" type="text" size="100" name="room_name" placeholder="Enter room name">
+        <button type="submit">Enter</button>
+    </form>
 </body>
+</html>
